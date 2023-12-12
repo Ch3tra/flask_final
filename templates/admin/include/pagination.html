@@ -1,0 +1,19 @@
+<div style="margin-top: 20px" class="text-center">
+    <template v-if="currentPage > 1">
+        <a @click="goToPage(1)" class="btn btn-outline-dark">First</a>
+        <a @click="prevPage" class="btn btn-outline-dark"><</a>
+        <template v-if="currentPage - 2 >= 1">
+            <a @click="goToPage(currentPage - 2)" class="btn btn-outline-dark">[[ currentPage - 2 ]]</a>
+        </template>
+    </template>
+
+    <span>---Page [[ currentPage ]]---</span>
+
+    <template v-if="currentPage < totalPages">
+        <template v-if="currentPage + 2 <= totalPages">
+            <a @click="goToPage(currentPage + 2)" class="btn btn-outline-dark">[[ currentPage + 2 ]]</a>
+        </template>
+        <a @click="nextPage" class="btn btn-outline-dark">></a>
+        <a @click="goToPage(totalPages)" class="btn btn-outline-dark">Last</a>
+    </template>
+</div>

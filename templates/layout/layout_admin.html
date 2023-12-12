@@ -1,0 +1,31 @@
+<!-- Title -->
+<title>{% block title %}{% endblock %}</title>
+
+<!-- Head -->
+{% include 'admin/include/head.html' %}
+
+<body class="hold-transition sidebar-mini layout-fixed">
+
+<div class="wrapper">
+
+    <!-- Preloader -->
+    {% include 'admin/include/loader.html' %}
+
+    <!-- Navbar -->
+    {% include 'admin/include/navbar.html' %}
+
+    <!-- Main Sidebar Container -->
+    {% include 'admin/include/sidebar.html' %}
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">{% block content %}{% endblock %}</div>
+
+    <!-- Footer -->
+    {% include 'admin/include/footer.html' %}
+
+</div>
+
+<!-- Script -->
+{% include 'admin/include/script.html' %}
+
+</body>
