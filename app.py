@@ -15,7 +15,7 @@ app.register_blueprint(apiC)
 
 
 @app.route('/')
-def hello_world():  # put application's code here
+def hello_world():
     return render_template('admin/index.html')
 
 
