@@ -7,6 +7,7 @@ from route.product.product import products
 
 app = Flask(__name__)
 
+app.config['UPLOAD_FOLDER_PRODUCT'] = 'static/img/product'
 
 app.register_blueprint(products)
 app.register_blueprint(categories)

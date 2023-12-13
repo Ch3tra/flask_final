@@ -1,4 +1,9 @@
-from flask import Blueprint, render_template
+import os
+
+from flask import Blueprint, render_template, request, jsonify, app
+from werkzeug.utils import secure_filename
+
+from config import execute_query
 
 products = Blueprint('products', __name__)
 

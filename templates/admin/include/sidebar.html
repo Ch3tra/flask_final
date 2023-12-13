@@ -28,7 +28,7 @@
                 <!--HOME PART-->
                 <li class="nav-header">HOMEPAGE</li>
                 <li class="nav-item">
-                    <a href="/" class="nav-link">
+                    <a href="/" class="nav-link{% if request.path == '/' %} active{% endif %}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>Dashboard</p>
                     </a>
@@ -37,13 +37,13 @@
                 <!--PRODUCT PART-->
                 <li class="nav-header">PRODUCTS</li>
                 <li class="nav-item">
-                    <a href="{{ url_for('products.product') }}" class="nav-link">
+                    <a href="{{ url_for('products.product') }}" class="nav-link{% if request.path == '/admin/product' %} active{% endif %}">
                         <i class="nav-icon fab fa-product-hunt"></i>
                         <p>Product lists</p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ url_for('categories.category') }}" class="nav-link">
+                    <a href="{{ url_for('categories.category') }}" class="nav-link{% if request.path == '/admin/category' %} active{% endif %}">
                         <i class="nav-icon far fa-list-alt"></i>
                         <p>Category lists</p>
                     </a>
@@ -52,7 +52,7 @@
                 <!--CUSTOMER PART-->
                 <li class="nav-header">CUSTOMERS</li>
                 <li class="nav-item">
-                    <a href="" class="nav-link">
+                    <a href="" class="nav-link{% if request.path == '/admin/customer' %} active{% endif %}">
                         <i class="nav-icon fas fa-users"></i>
                         <p>Customer lists</p>
                     </a>
