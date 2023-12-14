@@ -1,0 +1,113 @@
+<!--Bar -->
+<div class="content-header">
+    <div class="row">
+        <div class="col-6">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div style="display: flex;" class="col-sm-6">
+                        <i class="fab fa-product-hunt fa-2x"
+                           style="margin-top: 2px; margin-right: 10px;"></i>
+                        <h1 class="m-0">PRODUCT MODIFY</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <button @click="goTo('index')" style="float: right; margin-right: 30px"
+                    class="text-white btn-primary font-medium rounded-lg text-md px-3.5 py-2 inline-flex items-center">
+                <i class="fas fa-plus-circle" style="margin-right: 7px; margin-top: 2px;"></i>
+                GO BACK
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="max-width: 900px;">
+    <!--Name & Cost-->
+    <div v-for="item in detail_list" :key="item.id">
+        <div class="row" style="margin-top: 25px">
+            <div class="col-8">
+                <label>Name</label>
+                <input type="text" class="form-control" v-model="detail_list[0].name" style="width: 90%" maxlength="60">
+            </div>
+            <div class="col-4">
+                <label>Cost ($)</label>
+                <input type="number" class="form-control" v-model="detail_list[0].cost">
+            </div>
+        </div>
+
+        <!--Description-->
+        <div class="row" style="margin-top: 25px">
+            <div class="col-md-12">
+                <label>Description</label>
+                <textarea class="form-control" rows="4" style="resize: none;"
+                          v-model="detail_list[0].desc"></textarea>
+            </div>
+        </div>
+
+        <!--Category-->
+        <div class="row" style="margin-top: 25px">
+            <div class="col-12">
+                <label>Category</label>
+                <select class="form-control" style="max-width: 30%">
+                    <option selected :value="getCategoryId(detail_list[0].category)">
+                        [[ detail_list[0].category ]]
+                    </option>
+                    <option v-for="category in category_list" :value="category.id" :key="category.id">
+                        [[ category.name ]]
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <!--Image Dialog-->
+        <div class="row" style="margin-top: 25px">
+            <div class="col-6">
+                <label>Picture</label>
+                <img :src="getImageSrc(item.image)"
+                     alt="Profile Image"
+                     style="width: 200px; height: 180px; border-radius: 15px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); transition: all 0.3s ease-in-out; cursor: pointer;"
+                     @mouseover="scaleImage"
+                     @mouseout="resetImage"
+                     data-toggle="modal" data-target="#myModal"
+                >
+                <!-- The Modal -->
+                <div class="modal fade" id="myModal">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <!-- Modal body -->
+                            <div class="modal-body">
+                                <img :src="getImageSrc(item.image)"
+                                     alt="Profile Image"
+                                     style="width: 100%;">
+                            </div>
+                            <!-- Modal footer -->
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <label>New Image</label>
+                <input type="file" class="form-control"
+                       accept=".jpg,.png,.jfif"
+                       onchange="validateSize()"
+                       style="width: 89%"
+                >
+            </div>
+
+        </div>
+
+
+        <div class="row" style="margin-top: 25px;">
+            <div class="col-12">
+                <button @click="editForm(item.id)"
+                        class="text-white btn-primary font-medium rounded-lg text-md px-3.5 py-2 inline-flex items-center">
+                    Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

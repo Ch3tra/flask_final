@@ -64,8 +64,7 @@
                                                 </button>
                                             </div>
                                             <div class="w-5 mr-2.5 transform hover:text-blue-500 hover:scale-110">
-                                                <input type="hidden" value="[[ item.productId ]]" name="pid">
-                                                <button type="submit" title="Modify">
+                                                <button @click="goToEdits(item.id)" title="Modify">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                             </div>

@@ -10,5 +10,5 @@ products = Blueprint('products', __name__)
 
 @products.route('/admin/product')
 def product():
-    return render_template('admin/product/product_list.html')
+    return render_template('admin/product/main_product.html')
 

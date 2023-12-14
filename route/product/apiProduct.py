@@ -11,7 +11,7 @@ apiD = Blueprint('apiD', __name__)
 
 @apiD.route('/getAllProduct')
 def getAllProduct():
-    query = "SELECT product.*, category.categoryName AS category_name FROM product LEFT JOIN category ON product.categoryId = category.categoryId"
+    query = "SELECT product.*, category.categoryName AS category_name FROM product LEFT JOIN category ON product.categoryId = category.categoryId ORDER BY product.productId DESC"
     products = execute_query(query)
 
     query = "SELECT categoryId, categoryName from category"
@@ -74,3 +74,62 @@ def product_added():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
+@apiD.route('/admin/product_edit', methods=['POST'])
+def product_edit():
+    try:
+        pid = request.form['id']
+        name = request.form['name']
+        description = request.form['description']
+        cost = request.form['cost']
+        category = request.form['category']
+
+        image = request.files.get('image_upload')
+
+        # check if user input image or not
+        if image:
+            # Check the file extension
+            _, extension = os.path.splitext(image.filename)
+            if extension.lower() not in ['.jpg', '.png', '.jfif']:
+                return 'Invalid file type. Only jpg, png, and jfif files are allowed.', 400
+
+            # Check the file size (2MB = 2 * 1024 * 1024 bytes)
+            if image.content_length > 2 * 1024 * 1024:
+                return 'File size is too large. The maximum file size is 2MB.', 400
+
+            # Get the old image filename from the database
+            old_image_query = "SELECT image FROM product WHERE productId = %s"
+            old_image_filename = execute_query(old_image_query, (pid,), is_insert=False)[0]['image']
+
+            # Delete the old image file
+            if old_image_filename:
+                old_image_path = os.path.join(current_app.config['UPLOAD_FOLDER_PRODUCT'], old_image_filename)
+                if os.path.isfile(old_image_path):
+                    os.remove(old_image_path)
+
+            # Save the image to the upload folder, with name.extension as the filename
+            filename = secure_filename(f"{name}{extension}")
+            image.save(os.path.join(current_app.config['UPLOAD_FOLDER_PRODUCT'], filename))
+
+            query = f"UPDATE product SET " \
+                    f"categoryId = %s, " \
+                    f"productName = %s, " \
+                    f"productDesc = %s, " \
+                    f"productCost = %s, " \
+                    f"image = %s " \
+                    f"WHERE productId = %s"
+            params = (category, name, description, cost, filename, pid)
+        else:
+            query = f"UPDATE product SET " \
+                    f"categoryId = %s, " \
+                    f"productName = %s, " \
+                    f"productDesc = %s, " \
+                    f"productCost = %s " \
+                    f"WHERE productId = %s"
+            params = (category, name, description, cost, pid)
+
+        execute_query(query, params, is_insert=True)
+
+        return jsonify({'message': 'Product edited successfully'}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

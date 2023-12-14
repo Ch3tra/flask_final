@@ -1,0 +1,287 @@
+{% extends 'layout/layout_admin.html' %}
+
+{% block title %} PRODUCT {% endblock %}
+
+{% block content %}
+    <div id="app">
+
+        <div v-if="productContent == 'index'">
+            {% include 'admin/product/index.html' %}
+        </div>
+
+        <div v-if="productContent == 'addproduct'">
+            {% include 'admin/product/add_product.html' %}
+        </div>
+
+        <div v-if="productContent == 'detailproduct'">
+            {% include 'admin/product/detailproduct.html' %}
+        </div>
+
+        <div v-if="productContent == 'editproduct'">
+            {% include 'admin/product/edit_product.html' %}
+        </div>
+
+    </div>
+
+    <script>
+        var vue_obj = new Vue({
+            el: '#app',
+            delimiters: ["[[", ']]'],
+            data: {
+                //variables
+                product_list: [],
+                category_list: [],
+                detail_list: [],
+                currentPage: 1, // Current page number
+                itemsPerPage: 6, // Number of items per page
+                productContent: 'index', // set to 'index', for first page load
+            },
+            created() {
+                //run first after refreshed
+            },
+            computed: {
+                paginatedItems() {
+                    // if page 1, startindex=0, endindex = 0+6, so slice array(0, 6)
+                    // if page 2, startindex=6, endindex = 6+6, so slice array(6, 12)
+                    // if page 3, startindex=12, endindex = 12+6, so slice array(12, 18)....
+                    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+                    const endIndex = startIndex + this.itemsPerPage;
+                    return this.product_list.slice(startIndex, endIndex);
+                },
+                totalItems() {
+                    return this.product_list.length;
+                },
+                totalPages() {
+                    return Math.ceil(this.totalItems / this.itemsPerPage);
+                },
+            },
+            methods: {
+                getImageSrc(imageName) {
+                    return `{{ url_for('static', filename='img/product/') }}${imageName.includes('.') ? imageName : imageName + '.jpg'}`;
+                },
+                scaleImage(event) {
+                    event.target.style.transform = 'scale(1.05)';
+                    event.target.style.boxShadow = '0 20px 30px rgba(0, 0, 0, 0.2)';
+                },
+                resetImage(event) {
+                    event.target.style.transform = 'scale(1)';
+                    event.target.style.boxShadow = '0 10px 15px rgba(0, 0, 0, 0.1)';
+                },
+                nextPage() {
+                    if (this.currentPage < this.totalPages) {
+                        this.currentPage++;
+                    }
+                },
+                prevPage() {
+                    if (this.currentPage > 1) {
+                        this.currentPage--;
+                    }
+                },
+                goToPage(pageNumber) {
+                    if (pageNumber >= 1 && pageNumber <= this.totalPages) {
+                        this.currentPage = pageNumber;
+                    }
+                },
+                goTo(page) {
+                    if (page == 'addproduct') {
+                        this.productContent = 'addproduct';
+                    }
+                    if (page == 'index') {
+                        this.productContent = 'index';
+                    }
+                },
+                resetForm() {
+                    // Reset text inputs and text area
+                    document.querySelector('input[type="text"]').value = '';
+                    document.querySelector('input[type="number"]').value = '';
+                    document.querySelector('textarea').value = '';
+                    document.querySelector('select').selectedIndex = 0; // Reset select dropdown
+
+                    // Reset file input (image)
+                    const fileInput = document.querySelector('input[type="file"]');
+                    fileInput.value = ''; // Reset the value of the input
+                    if (fileInput.files && fileInput.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function () {
+                            fileInput.value = '';
+                        };
+                        reader.readAsDataURL(fileInput.files[0]);
+                    }
+                },
+                submitForm() {
+                    const name = document.querySelector('input[type="text"]').value;
+                    const cost = document.querySelector('input[type="number"]').value;
+                    const description = document.querySelector('textarea').value;
+                    const category = document.querySelector('select').value;
+
+                    // Define patterns for each field (modify as needed)
+                    const namePattern = /^[A-Za-z\s]+$/; // Only letters and spaces
+                    const costPattern = /^\d+(\.\d{1,2})?$/; // Decimal number with up to 2 decimal places
+                    const descriptionPattern = /^.{10,}$/; // Minimum 10 characters for description
+
+                    // Define error messages for each field (modify as needed)
+                    const errorMessage = {
+                        name: 'Invalid name (letters and spaces only)',
+                        cost: 'Invalid cost (* or *.**)',
+                        description: 'Invalid description (minimum 10 letters)',
+                        category: 'Please select a category'
+                    };
+
+                    // Perform manual validation for each field
+                    const missingFields = [];
+                    if (!name || !namePattern.test(name)) {
+                        missingFields.push(errorMessage.name);
+                    }
+                    if (!cost || !costPattern.test(cost)) {
+                        missingFields.push(errorMessage.cost);
+                    }
+                    if (!description || !descriptionPattern.test(description)) {
+                        missingFields.push(errorMessage.description);
+                    }
+                    if (!category) {
+                        missingFields.push(errorMessage.category);
+                    }
+
+                    // If any field is missing or doesn't match the pattern, alert about the issue
+                    if (missingFields.length > 0) {
+                        const errorMessage = missingFields.join('<br><br>');
+                        Swal.fire({
+                            title: "Oops...",
+                            html: `Please fill or check the following:<br><br>${errorMessage}`,
+                        });
+                        return; // Stop further execution if validation fails
+                    }
+
+                    // Get the file input element and its selected file
+                    const fileInput = document.querySelector('input[type="file"]');
+                    const imageFile = fileInput.files[0];
+
+                    // Create a FormData object to send both form data and the image file
+                    const formData = new FormData();
+                    formData.append('name', name);
+                    formData.append('cost', cost);
+                    formData.append('description', description);
+                    formData.append('category', category);
+                    formData.append('image_upload', imageFile);
+
+                    axios.post('http://127.0.0.1:5000/admin/product_added', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    })
+                        .then(response => {
+                            console.log('Product added successfully:', response.data);
+                            this.getProducts();
+                            this.productContent = 'index';
+                        })
+                        .catch(error => {
+                            console.error('Error adding product:', error);
+                        });
+                },
+                editForm(id) {
+                    const pid = id;
+                    const name = document.querySelector('input[type="text"]').value;
+                    const cost = document.querySelector('input[type="number"]').value;
+                    const description = document.querySelector('textarea').value;
+                    const category = document.querySelector('select').value;
+
+                    // Define patterns for each field (modify as needed)
+                    const namePattern = /^[A-Za-z\s]+$/; // Only letters and spaces
+                    const costPattern = /^\d+(\.\d{1,2})?$/; // Decimal number with up to 2 decimal places
+                    const descriptionPattern = /^.{10,}$/; // Minimum 10 characters for description
+
+                    // Define error messages for each field (modify as needed)
+                    const errorMessage = {
+                        name: 'Invalid name (letters and spaces only)',
+                        cost: 'Invalid cost (* or *.**)',
+                        description: 'Invalid description (minimum 10 letters)',
+                        category: 'Please select a category'
+                    };
+
+                    // Perform manual validation for each field
+                    const missingFields = [];
+                    if (!name || !namePattern.test(name)) {
+                        missingFields.push(errorMessage.name);
+                    }
+                    if (!cost || !costPattern.test(cost)) {
+                        missingFields.push(errorMessage.cost);
+                    }
+                    if (!description || !descriptionPattern.test(description)) {
+                        missingFields.push(errorMessage.description);
+                    }
+                    if (!category) {
+                        missingFields.push(errorMessage.category);
+                    }
+
+                    // If any field is missing or doesn't match the pattern, alert about the issue
+                    if (missingFields.length > 0) {
+                        const errorMessage = missingFields.join('<br><br>');
+                        Swal.fire({
+                            title: "Oops...",
+                            html: `Please fill or check the following:<br><br>${errorMessage}`,
+                        });
+                        return; // Stop further execution if validation fails
+                    }
+
+                    // Get the file input element and its selected file
+                    const fileInput = document.querySelector('input[type="file"]');
+                    const imageFile = fileInput.files[0];
+
+                    // Create a FormData object to send both form data and the image file
+                    const formData = new FormData();
+                    formData.append('id', pid);
+                    formData.append('name', name);
+                    formData.append('cost', cost);
+                    formData.append('description', description);
+                    formData.append('category', category);
+                    formData.append('image_upload', imageFile);
+
+                    axios.post('http://127.0.0.1:5000/admin/product_edit', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    })
+                        .then(response => {
+                            console.log('Product edited successfully:', response.data);
+                            this.getProducts();
+                            this.productContent = 'index';
+                        })
+                        .catch(error => {
+                            console.error('Error editing product:', error);
+                        });
+                },
+                getProducts() {
+                    // Axios API request to fetch data and assign to product_list
+                    axios.get('http://127.0.0.1:5000/getAllProduct')
+                        .then(response => {
+                            this.product_list = response.data.products;
+                            this.category_list = response.data.categories;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching data:', error);
+                        });
+                },
+                goToDetails(id) {
+                    // Filter the product_list to get details of the selected product by id
+                    this.detail_list = this.product_list.filter(product => product.id === id);
+                    // Set the productContent to 'detailproduct' to display the details view
+                    this.productContent = 'detailproduct';
+                },
+                getCategoryId(categoryName) {
+                    const matchedCategory = this.category_list.find(category => category.name === categoryName);
+                    return matchedCategory ? matchedCategory.id : null;
+                },
+                goToEdits(id) {
+                    // Filter the product_list to get details of the selected product by id
+                    this.detail_list = this.product_list.filter(product => product.id === id);
+                    // Set the productContent to 'editproduct' to display the details view
+                    this.productContent = 'editproduct';
+                }
+            },
+            mounted() {
+                this.getProducts();
+            }
+        })
+    </script>
+{% endblock %}
+
