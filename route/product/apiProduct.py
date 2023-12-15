@@ -28,6 +28,7 @@ def getAllProduct():
                 'category': product['category_name'],
                 'desc': product['productDesc'],
                 'cost': product['productCost'],
+                'discount': product['discount'],
                 'image': product['image'],
             }
         )
