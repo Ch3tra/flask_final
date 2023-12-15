@@ -69,10 +69,7 @@
                                                 </button>
                                             </div>
                                             <div class="w-5 mr-2.5 transform hover:text-red-500 hover:scale-110">
-                                                <input type="hidden" value="[[ item.productId ]]" name="pid">
-                                                <input type="hidden" value="[[ item.image ]]"
-                                                       name="image_upload">
-                                                <button type="submit" title="Delete">
+                                                <button @click="deleteForm(item.id, item.image)" title="Delete">
                                                     <i class="fas fa-trash-alt"></i>
                                                 </button>
                                             </div>

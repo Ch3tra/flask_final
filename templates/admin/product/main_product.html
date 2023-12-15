@@ -40,6 +40,7 @@
                 //run first after refreshed
             },
             computed: {
+                // for paginations
                 paginatedItems() {
                     // if page 1, startindex=0, endindex = 0+6, so slice array(0, 6)
                     // if page 2, startindex=6, endindex = 6+6, so slice array(6, 12)
@@ -56,17 +57,19 @@
                 },
             },
             methods: {
-                getImageSrc(imageName) {
-                    return `{{ url_for('static', filename='img/product/') }}${imageName.includes('.') ? imageName : imageName + '.jpg'}`;
+                // fetch all product and category from api
+                getProducts() {
+                    // Axios API request to fetch data and assign to product_list
+                    axios.get('http://127.0.0.1:5000/getAllProduct')
+                        .then(response => {
+                            this.product_list = response.data.products;
+                            this.category_list = response.data.categories;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching data:', error);
+                        });
                 },
-                scaleImage(event) {
-                    event.target.style.transform = 'scale(1.05)';
-                    event.target.style.boxShadow = '0 20px 30px rgba(0, 0, 0, 0.2)';
-                },
-                resetImage(event) {
-                    event.target.style.transform = 'scale(1)';
-                    event.target.style.boxShadow = '0 10px 15px rgba(0, 0, 0, 0.1)';
-                },
+                // for paginations
                 nextPage() {
                     if (this.currentPage < this.totalPages) {
                         this.currentPage++;
@@ -82,6 +85,20 @@
                         this.currentPage = pageNumber;
                     }
                 },
+                // display image with image string from database
+                getImageSrc(imageName) {
+                    return `{{ url_for('static', filename='img/product/') }}${imageName.includes('.') ? imageName : imageName + '.jpg'}`;
+                },
+                // big size image js
+                scaleImage(event) {
+                    event.target.style.transform = 'scale(1.05)';
+                    event.target.style.boxShadow = '0 20px 30px rgba(0, 0, 0, 0.2)';
+                },
+                resetImage(event) {
+                    event.target.style.transform = 'scale(1)';
+                    event.target.style.boxShadow = '0 10px 15px rgba(0, 0, 0, 0.1)';
+                },
+                // navigate to add page and back for button
                 goTo(page) {
                     if (page == 'addproduct') {
                         this.productContent = 'addproduct';
@@ -90,6 +107,7 @@
                         this.productContent = 'index';
                     }
                 },
+                // reset and submit method add product for button
                 resetForm() {
                     // Reset text inputs and text area
                     document.querySelector('input[type="text"]').value = '';
@@ -178,6 +196,13 @@
                             console.error('Error adding product:', error);
                         });
                 },
+                // navigate to edit page with id and save or edit product method for button
+                goToEdits(id) {
+                    // Filter the product_list to get details of the selected product by id
+                    this.detail_list = this.product_list.filter(product => product.id === id);
+                    // Set the productContent to 'editproduct' to display the details view
+                    this.productContent = 'editproduct';
+                },
                 editForm(id) {
                     const pid = id;
                     const name = document.querySelector('input[type="text"]').value;
@@ -250,17 +275,7 @@
                             console.error('Error editing product:', error);
                         });
                 },
-                getProducts() {
-                    // Axios API request to fetch data and assign to product_list
-                    axios.get('http://127.0.0.1:5000/getAllProduct')
-                        .then(response => {
-                            this.product_list = response.data.products;
-                            this.category_list = response.data.categories;
-                        })
-                        .catch(error => {
-                            console.error('Error fetching data:', error);
-                        });
-                },
+                // navigate to detail page with id
                 goToDetails(id) {
                     // Filter the product_list to get details of the selected product by id
                     this.detail_list = this.product_list.filter(product => product.id === id);
@@ -271,12 +286,40 @@
                     const matchedCategory = this.category_list.find(category => category.name === categoryName);
                     return matchedCategory ? matchedCategory.id : null;
                 },
-                goToEdits(id) {
-                    // Filter the product_list to get details of the selected product by id
-                    this.detail_list = this.product_list.filter(product => product.id === id);
-                    // Set the productContent to 'editproduct' to display the details view
-                    this.productContent = 'editproduct';
-                }
+                deleteForm(id, image) {
+                    const pid = id;
+                    const pimage = image;
+
+                    const formData = new FormData();
+                    formData.append('id', pid);
+                    formData.append('image', pimage);
+
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You won't be able to revert this!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, delete it!"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            axios.post('http://127.0.0.1:5000/admin/product_delete', formData, {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data'
+                                }
+                            })
+                                .then(response => {
+                                    console.log('Product deleted successfully:', response.data);
+                                    this.getProducts();
+                                    this.productContent = 'index';
+                                })
+                                .catch(error => {
+                                    console.error('Error deleting product:', error);
+                                });
+                        }
+                    });
+                },
             },
             mounted() {
                 this.getProducts();

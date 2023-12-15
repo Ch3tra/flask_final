@@ -133,3 +133,23 @@ def product_edit():
         return jsonify({'message': 'Product edited successfully'}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@apiD.route('/admin/product_delete', methods=['POST'])
+def product_delete():
+    try:
+        pid = request.form['id']
+        image = request.form['image']
+
+        # check if image not default image
+        if image != 'default_img':
+            image_path = os.path.join(current_app.config['UPLOAD_FOLDER_PRODUCT'], image)
+            if os.path.isfile(image_path):
+                os.remove(image_path)
+
+        query = f"DELETE FROM product WHERE productId = %s"
+        execute_query(query, (pid,), is_insert=True)
+
+        return jsonify({'message': 'Product deleted successfully'}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
