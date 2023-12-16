@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link rel="stylesheet" href="../../static/css/login_styles.css">
+</head>
+<body>
+
+<form class="form login" action="{{ url_for('auths.register') }}" method="POST">
+    <h1>Register</h1>
+    <input type="text" name="username" required placeholder="Username">
+    <input type="password" name="password" required placeholder="Password">
+    <button type="submit">Register</button>
+    <a style="display: flex; margin-top: 22px;" href="/admin">Cancel</a>
+</form>
+
+</body>
+</html>

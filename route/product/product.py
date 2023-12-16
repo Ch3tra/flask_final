@@ -1,14 +1,11 @@
-import os
-
-from flask import Blueprint, render_template, request, jsonify, app
-from werkzeug.utils import secure_filename
-
-from config import execute_query
+from flask import Blueprint, render_template
+from flask_login import login_required
 
 products = Blueprint('products', __name__)
 
 
 @products.route('/admin/product')
+@login_required
 def product():
     return render_template('admin/product/main_product.html')
 

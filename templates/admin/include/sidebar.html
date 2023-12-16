@@ -1,6 +1,6 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="/" class="brand-link">
+    <a href="/admin" class="brand-link">
         <img src="../../static/admin/dist/img/AdminLTELogo.png" alt="AdminLTE Logo"
              class="brand-image img-circle elevation-3"
              style="opacity: .8">
@@ -16,7 +16,7 @@
                      alt="User Image">
             </div>
             <div class="info">
-                <a href="/" class="d-block">Alexander Pierce</a>
+                <a href="/admin" class="d-block">Alexander Pierce</a>
             </div>
         </div>
 
@@ -28,7 +28,7 @@
                 <!--HOME PART-->
                 <li class="nav-header">HOMEPAGE</li>
                 <li class="nav-item">
-                    <a href="/" class="nav-link{% if request.path == '/' %} active{% endif %}">
+                    <a href="/admin" class="nav-link{% if request.path == '/admin' %} active{% endif %}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>Dashboard</p>
                     </a>
@@ -37,13 +37,15 @@
                 <!--PRODUCT PART-->
                 <li class="nav-header">PRODUCTS</li>
                 <li class="nav-item">
-                    <a href="{{ url_for('products.product') }}" class="nav-link{% if request.path == '/admin/product' %} active{% endif %}">
+                    <a href="{{ url_for('products.product') }}"
+                       class="nav-link{% if request.path == '/admin/product' %} active{% endif %}">
                         <i class="nav-icon fab fa-product-hunt"></i>
                         <p>Product lists</p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ url_for('categories.category') }}" class="nav-link{% if request.path == '/admin/category' %} active{% endif %}">
+                    <a href="{{ url_for('categories.category') }}"
+                       class="nav-link{% if request.path == '/admin/category' %} active{% endif %}">
                         <i class="nav-icon far fa-list-alt"></i>
                         <p>Category lists</p>
                     </a>
@@ -57,8 +59,14 @@
                         <p>Customer lists</p>
                     </a>
                 </li>
-
             </ul>
         </nav>
+        <a href="{{ url_for('auths.logout') }}">
+            <button style="width: 100%; position: absolute; bottom: 30px; transform: translateX(-50%);
+                left: 50%; max-width: 200px; font-weight: 700; font-size: 15px"
+                    type="button" class="btn btn-default btn-sm">
+                <span class="glyphicon glyphicon-log-out"></span> Log out
+            </button>
+        </a>
     </div>
 </aside>

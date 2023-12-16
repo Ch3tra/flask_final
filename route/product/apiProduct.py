@@ -10,6 +10,7 @@ apiD = Blueprint('apiD', __name__)
 
 
 @apiD.route('/getAllProduct')
+@login_required
 def getAllProduct():
     query = "SELECT product.*, category.categoryName AS category_name FROM product LEFT JOIN category ON product.categoryId = category.categoryId ORDER BY product.productId DESC"
     products = execute_query(query)
@@ -43,6 +44,7 @@ def getAllProduct():
 
 
 @apiD.route('/admin/product_added', methods=['POST'])
+@login_required
 def product_added():
     try:
         name = request.form['name']
@@ -77,6 +79,7 @@ def product_added():
 
 
 @apiD.route('/admin/product_edit', methods=['POST'])
+@login_required
 def product_edit():
     try:
         pid = request.form['id']
@@ -137,6 +140,7 @@ def product_edit():
 
 
 @apiD.route('/admin/product_delete', methods=['POST'])
+@login_required
 def product_delete():
     try:
         pid = request.form['id']

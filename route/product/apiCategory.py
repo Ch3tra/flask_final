@@ -7,6 +7,7 @@ apiC = Blueprint('apiC', __name__)
 
 
 @apiC.route('/getAllCategory')
+@login_required
 def getAllCategory():
     query = "SELECT * FROM category"
     categories = execute_query(query)

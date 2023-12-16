@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="../../static/css/login_styles.css">
+</head>
+<body>
+
+<form class="form login" action="{{ url_for('auths.login') }}" method="POST">
+    <h1>LogIn</h1>
+    <input type="text" name="username" required placeholder="Username">
+    <input type="password" name="password" required placeholder="Password">
+    <button type="submit">Login</button>
+</form>
+
+</body>
+</html>

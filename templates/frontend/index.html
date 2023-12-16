@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+{% include 'frontend/include/head.html' %}
+<title>Homepage</title>
+<body>
+
+{#category_bar#}
+<div id="app" style="position: absolute; top: 0; z-index: 500;" class="container">
+    <div class="row mt-1 p-1"
+         style="border-radius: 5px;
+                    background-color: whitesmoke;
+                    display: flex; justify-content: center; align-items: center;">
+        <a href="{{ url_for('admin') }}">
+            <button
+                    class="btn btn-outline-primary ml-1 mr-1"
+                    type="button"
+                    style="text-transform: uppercase">
+                Admin
+            </button>
+        </a>
+
+        <button
+                @click="filter_category(all)"
+                :class="{ 'btn btn-outline-primary ml-1 mr-1': true, 'active': filter_category === category }"
+                type="button"
+                style="text-transform: uppercase"
+        >
+            all
+        </button>
+
+        <button
+                v-for="item in this.categories"
+                @click="filter_category(item.name)"
+                :class="{ 'btn btn-outline-primary ml-1 mr-1': true, 'active': filter_category === category }"
+                type="button"
+                style="text-transform: uppercase"
+        >
+            [[ item.name ]]
+        </button>
+
+    </div>
+
+    {#product#}
+    <div class="row">
+        <div v-for="item in this.product_list" class="col-lg-3 col-md-5 col-sm-6 col-xs-12">
+            <div class="card">
+                <div class="imgBox">
+                    <img src="/static/img/viper.png" class="mouse">
+                </div>
+                <div class="contentBox">
+                    <h3>[[ item.name ]]</h3>
+                    <h2 style="margin-top: 5px;" class="price">[[ item.price ]] €</h2>
+                    <a :href="'/product/' + item.name + '/' + item.price + '/' + item.category + '/viper.png'"
+                       class="details" :class="{ 'active': product_details === item.name }">Details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+
+<script>
+    var vue_obj = new Vue({
+        el: '#app',
+        delimiters: ["[[", ']]'],
+        data: {
+            categories: [],
+            product_list: [],
+            filter_cate: null
+        },
+        created() {
+            //run first after refreshed
+        },
+        methods: {
+            filter_category(name) {
+                const encodedCategoryName = encodeURIComponent(name); // Encode the category name
+                if (name != 'all' && name != null) {
+                    axios.get(`http://127.0.0.1:5000/getAllFProduct?filter_category=${encodedCategoryName}`)
+                        .then(response => {
+                            this.product_list = response.data.products;
+                            $.LoadingOverlay("hide");
+                        })
+                        .catch(error => {
+                            console.error('Error fetching data:', error);
+                            $.LoadingOverlay("hide");
+                        });
+                } else {
+                    axios.get(`http://127.0.0.1:5000/getAllFProduct`)
+                        .then(response => {
+                            this.product_list = response.data.products;
+                            $.LoadingOverlay("hide");
+                        })
+                        .catch(error => {
+                            console.error('Error fetching data:', error);
+                            $.LoadingOverlay("hide");
+                        });
+                }
+            }
+        },
+        mounted() {
+            $.LoadingOverlay("show");
+            axios.get(`http://127.0.0.1:5000/getAllFProduct`)
+                .then(response => {
+                    this.product_list = response.data.products;
+                    this.categories = response.data.categories;
+                    $.LoadingOverlay("hide");
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    $.LoadingOverlay("hide");
+                });
+
+        }
+
+    })
+</script>
+
+</html>
