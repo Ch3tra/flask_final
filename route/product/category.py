@@ -7,4 +7,4 @@ categories = Blueprint('categories', __name__)
 @categories.route('/admin/category')
 @login_required
 def category():
-    return render_template('admin/product/category_list.html')
+    return render_template('admin/product/main_category.html')

@@ -5,18 +5,18 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div style="display: flex;" class="col-sm-6">
-                        <i class="fab fa-product-hunt fa-2x"
+                        <i class="fab far fa-list-alt fa-2x"
                            style="margin-top: 2px; margin-right: 10px;"></i>
-                        <h1 class="m-0">PRODUCT LIST</h1>
+                        <h1 class="m-0">CATEGORY LISTS</h1>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-6">
-            <button @click="goTo('addproduct')" style="float: right; margin-right: 50px"
+            <button @click="goTo('addcategory')" style="float: right; margin-right: 30px"
                     class="text-white btn-primary font-medium rounded-lg text-md px-3.5 py-2 inline-flex items-center">
                 <i class="fas fa-plus-circle" style="margin-right: 7px; margin-top: 2px;"></i>
-                Add New Product
+                Add New Category
             </button>
         </div>
     </div>
@@ -34,10 +34,7 @@
                                 <thead>
                                 <tr class="bg-gray-200 text-gray-500 uppercase text-sm leading-normal">
                                     <th class="py-3 px-6 text-left">Name</th>
-                                    <th class="py-3 px-6 text-center">Picture</th>
-                                    <th class="py-3 px-6 text-center">Category</th>
                                     <th class="py-3 px-6 text-center">Description</th>
-                                    <th class="py-3 px-6 text-center">Cost ($)</th>
                                     <th class="py-3 px-6 text-center">Actions</th>
                                 </tr>
                                 </thead>
@@ -45,15 +42,7 @@
                                 <tbody v-for="(item, index) in paginatedItems" :key="index">
                                 <tr>
                                     <td class="py-3 px-6 text-left">[[ item.name ]]</td>
-                                    <td class="py-3 px-6 text-center">
-                                        <div class="flex items-center justify-center">
-                                            <img class="w-8 h-8 rounded-full border-gray-200 border transform hover:scale-150"
-                                                 :src="getImageSrc(item.image)"/>
-                                        </div>
-                                    </td>
-                                    <td class="py-3 px-6 text-center">[[ item.category ]]</td>
                                     <td class="py-3 px-6 text-center">[[ item.desc ]]</td>
-                                    <td class="py-3 px-6 text-center">[[ item.cost ]]</td>
 
                                     <td class="py-3 px-6 text-center">
                                         <div class="flex item-center justify-center"
@@ -69,12 +58,13 @@
                                                 </button>
                                             </div>
                                             <div class="w-5 mr-2.5 transform hover:text-red-500 hover:scale-110">
-                                                <button @click="deleteForm(item.id, item.image)" title="Delete">
+                                                <button @click="deleteForm(item.id)" title="Delete">
                                                     <i class="fas fa-trash-alt"></i>
                                                 </button>
                                             </div>
                                         </div>
                                     </td>
+
                                 </tr>
                                 </tbody>
                             </table>

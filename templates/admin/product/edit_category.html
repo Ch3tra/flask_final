@@ -1,0 +1,53 @@
+<!--Bar -->
+<div class="content-header">
+    <div class="row">
+        <div class="col-6">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div style="display: flex;" class="col-sm-6">
+                        <i class="fab fa-product-hunt fa-2x"
+                           style="margin-top: 2px; margin-right: 10px;"></i>
+                        <h1 class="m-0">CATEGORY MODIFY</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <button @click="goTo('index')" style="float: right; margin-right: 30px"
+                    class="text-white btn-primary font-medium rounded-lg text-md px-3.5 py-2 inline-flex items-center">
+                <i class="fas fa-plus-circle" style="margin-right: 7px; margin-top: 2px;"></i>
+                GO BACK
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="max-width: 900px;">
+    <!--Name & Cost-->
+    <div v-for="item in detail_list" :key="item.id">
+        <div class="row" style="margin-top: 25px">
+            <div class="col-8">
+                <label>Name</label>
+                <input type="text" class="form-control" v-model="detail_list[0].name" style="width: 90%" maxlength="60">
+            </div>
+        </div>
+
+        <!--Description-->
+        <div class="row" style="margin-top: 25px">
+            <div class="col-md-12">
+                <label>Description</label>
+                <textarea class="form-control" rows="4" style="resize: none;"
+                          v-model="detail_list[0].desc"></textarea>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 25px;">
+            <div class="col-12">
+                <button @click="editForm(detail_list[0].id)"
+                        class="text-white btn-primary font-medium rounded-lg text-md px-3.5 py-2 inline-flex items-center">
+                    Edit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

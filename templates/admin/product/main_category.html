@@ -1,0 +1,263 @@
+{% extends 'layout/layout_admin.html' %}
+
+{% block title %} CATEGORY-LIST {% endblock %}
+
+{% block content %}
+    <div id="app">
+
+        <div v-if="categoryContent == 'index'">
+            {% include 'admin/product/index_category.html' %}
+        </div>
+
+        <div v-if="categoryContent == 'addcategory'">
+            {% include 'admin/product/add_category.html' %}
+        </div>
+
+        <div v-if="categoryContent == 'detailcategory'">
+            {% include 'admin/product/detail_category.html' %}
+        </div>
+
+        <div v-if="categoryContent == 'editcategory'">
+            {% include 'admin/product/edit_category.html' %}
+        </div>
+
+    </div>
+
+    <script>
+        var vue_obj = new Vue({
+            el: '#app',
+            delimiters: ["[[", ']]'],
+            data: {
+                //variables
+                category_list: [],
+                detail_list: [],
+                currentPage: 1, // Current page number
+                itemsPerPage: 6, // Number of items per page
+                categoryContent: 'index', // set to 'index', for first page load
+            },
+            created() {
+                //run first after refreshed
+            },
+            computed: {
+                // for paginations
+                paginatedItems() {
+                    // if page 1, startindex=0, endindex = 0+6, so slice array(0, 6)
+                    // if page 2, startindex=6, endindex = 6+6, so slice array(6, 12)
+                    // if page 3, startindex=12, endindex = 12+6, so slice array(12, 18)....
+                    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+                    const endIndex = startIndex + this.itemsPerPage;
+                    return this.category_list.slice(startIndex, endIndex);
+                },
+                totalItems() {
+                    return this.category_list.length;
+                },
+                totalPages() {
+                    return Math.ceil(this.totalItems / this.itemsPerPage);
+                },
+            },
+            methods: {
+                // fetch all product and category from api
+                getCategory() {
+                    // Axios API request to fetch data and assign to product_list
+                    // Axios API request to fetch data and assign to product_list
+                    axios.get('http://127.0.0.1:5000/getAllCategory')
+                        .then(response => {
+                            this.category_list = response.data.cate;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching data:', error);
+                        });
+                },
+                // for paginations
+                nextPage() {
+                    if (this.currentPage < this.totalPages) {
+                        this.currentPage++;
+                    }
+                },
+                prevPage() {
+                    if (this.currentPage > 1) {
+                        this.currentPage--;
+                    }
+                },
+                goToPage(pageNumber) {
+                    if (pageNumber >= 1 && pageNumber <= this.totalPages) {
+                        this.currentPage = pageNumber;
+                    }
+                },
+                // navigate to add page and back for button
+                goTo(page) {
+                    if (page == 'addcategory') {
+                        this.categoryContent = 'addcategory';
+                    }
+                    if (page == 'index') {
+                        this.categoryContent = 'index';
+                    }
+                },
+                // reset and submit method add product for button
+                resetForm() {
+                    // Reset text inputs and text area
+                    document.querySelector('input[type="text"]').value = '';
+                    document.querySelector('textarea').value = '';
+                },
+                submitForm() {
+                    const name = document.querySelector('input[type="text"]').value;
+                    const description = document.querySelector('textarea').value;
+
+                    // Define patterns for each field (modify as needed)
+                    const namePattern = /^[A-Za-z\s]+$/; // Only letters and spaces
+                    const descriptionPattern = /^.{10,}$/; // Minimum 10 characters for description
+
+                    // Define error messages for each field (modify as needed)
+                    const errorMessage = {
+                        name: 'Invalid name (letters and spaces only)',
+                        description: 'Invalid description (minimum 10 letters)',
+                    };
+
+                    // Perform manual validation for each field
+                    const missingFields = [];
+                    if (!name || !namePattern.test(name)) {
+                        missingFields.push(errorMessage.name);
+                    }
+                    if (!description || !descriptionPattern.test(description)) {
+                        missingFields.push(errorMessage.description);
+                    }
+
+                    // If any field is missing or doesn't match the pattern, alert about the issue
+                    if (missingFields.length > 0) {
+                        const errorMessage = missingFields.join('<br><br>');
+                        Swal.fire({
+                            title: "Oops...",
+                            html: `Please fill or check the following:<br><br>${errorMessage}`,
+                        });
+                        return; // Stop further execution if validation fails
+                    }
+
+
+                    // Create a FormData object to send both form data and the image file
+                    const formData = new FormData();
+                    formData.append('name', name);
+                    formData.append('description', description);
+
+                    axios.post('http://127.0.0.1:5000/admin/category_added', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    })
+                        .then(response => {
+                            console.log('Category added successfully:', response.data);
+                            this.getCategory();
+                            this.categoryContent = 'index';
+                        })
+                        .catch(error => {
+                            console.error('Error adding product:', error);
+                        });
+                },
+                // navigate to edit page with id and save or edit product method for button
+                goToEdits(id) {
+                    // Filter the product_list to get details of the selected product by id
+                    this.detail_list = this.category_list.filter(cate => cate.id === id);
+                    // Set the categoryContent to 'editproduct' to display the details view
+                    this.categoryContent = 'editcategory';
+                },
+                editForm(id) {
+                    const pid = id;
+                    const name = document.querySelector('input[type="text"]').value;
+                    const description = document.querySelector('textarea').value;
+
+                    // Define patterns for each field (modify as needed)
+                    const namePattern = /^[A-Za-z\s]+$/; // Only letters and spaces
+                    const descriptionPattern = /^.{10,}$/; // Minimum 10 characters for description
+
+                    // Define error messages for each field (modify as needed)
+                    const errorMessage = {
+                        name: 'Invalid name (letters and spaces only)',
+                        description: 'Invalid description (minimum 10 letters)',
+                    };
+
+                    // Perform manual validation for each field
+                    const missingFields = [];
+                    if (!name || !namePattern.test(name)) {
+                        missingFields.push(errorMessage.name);
+                    }
+                    if (!description || !descriptionPattern.test(description)) {
+                        missingFields.push(errorMessage.description);
+                    }
+
+                    // If any field is missing or doesn't match the pattern, alert about the issue
+                    if (missingFields.length > 0) {
+                        const errorMessage = missingFields.join('<br><br>');
+                        Swal.fire({
+                            title: "Oops...",
+                            html: `Please fill or check the following:<br><br>${errorMessage}`,
+                        });
+                        return; // Stop further execution if validation fails
+                    }
+
+                    // Create a FormData object to send both form data and the image file
+                    const formData = new FormData();
+                    formData.append('id', pid);
+                    formData.append('name', name);
+                    formData.append('description', description);
+
+                    axios.post('http://127.0.0.1:5000/admin/category_edit', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    })
+                        .then(response => {
+                            console.log('Category edited successfully:', response.data);
+                            this.getCategory();
+                            this.categoryContent = 'index';
+                        })
+                        .catch(error => {
+                            console.error('Error editing category:', error);
+                        });
+                },
+                // navigate to detail page with id
+                goToDetails(id) {
+                    // Filter the product_list to get details of the selected product by id
+                    this.detail_list = this.category_list.filter(cate => cate.id === id);
+                    // Set the categoryContent to 'detailproduct' to display the details view
+                    this.categoryContent = 'detailcategory';
+                },
+                // delete product
+                deleteForm(id) {
+                    const pid = id;
+
+                    const formData = new FormData();
+                    formData.append('id', pid);
+
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You won't be able to revert this!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, delete it!"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            axios.post('http://127.0.0.1:5000/admin/category_delete', formData, {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data'
+                                }
+                            })
+                                .then(response => {
+                                    console.log('Category deleted successfully:', response.data);
+                                    this.getCategory();
+                                    this.categoryContent = 'index';
+                                })
+                                .catch(error => {
+                                    console.error('Error deleting product:', error);
+                                });
+                        }
+                    });
+                },
+            },
+            mounted() {
+                this.getCategory();
+            }
+        })
+    </script>
+{% endblock %}
+
