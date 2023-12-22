@@ -59,7 +59,9 @@ def product_added():
             if extension.lower() not in ['.jpg', '.png', '.jfif']:
                 return 'Invalid file type. Only jpg, png, and jfif files are allowed.', 400
 
-            if image.content_length > 2 * 1024 * 1024:  # 2MB limit
+            file_size = image.content_length  # Get file size directly from the request
+
+            if file_size > 2 * 1024 * 1024:  # 2MB limit
                 return 'File size is too large. The maximum file size is 2MB.', 400
 
             filename = secure_filename(f"{name}{extension}")

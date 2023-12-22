@@ -170,9 +170,32 @@
                         return; // Stop further execution if validation fails
                     }
 
-                    // Get the file input element and its selected file
                     const fileInput = document.querySelector('input[type="file"]');
                     const imageFile = fileInput.files[0];
+
+                    if (imageFile) {
+                        const validExtensions = ['.jpg', '.png', '.jfif'];
+                        const extension = imageFile.name.split('.').pop().toLowerCase();
+
+                        if (!validExtensions.includes(`.${extension}`)) {
+                            Swal.fire({
+                                title: "Oops...",
+                                text: "Invalid file type. Only jpg, png, and jfif files are allowed.",
+                            });
+                            return;
+                        }
+
+                        const fileSizeInMB = imageFile.size / (1024 * 1024); // Calculate file size in MB
+                        const allowedFileSizeMB = 2; // 2MB limit
+
+                        if (fileSizeInMB > allowedFileSizeMB) {
+                            Swal.fire({
+                                title: "Oops...",
+                                text: "File size is too large. The maximum file size is 2MB.",
+                            });
+                            return;
+                        }
+                    }
 
                     // Create a FormData object to send both form data and the image file
                     const formData = new FormData();

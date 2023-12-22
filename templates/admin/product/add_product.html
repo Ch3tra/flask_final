@@ -24,61 +24,59 @@
 
 <div class="container" style="max-width: 900px;">
     <!--Name & Cost-->
-    <div class="row" style="margin-top: 25px">
-        <div class="col-8">
-            <label>Name</label>
-            <input type="text" class="form-control" required style="width: 90%" maxlength="60">
+        <div class="row" style="margin-top: 25px">
+            <div class="col-8">
+                <label>Name</label>
+                <input type="text" class="form-control" required style="width: 90%" maxlength="60">
+            </div>
+            <div class="col-4">
+                <label>Cost ($)</label>
+                <input type="number" step="0.01" class="form-control" required>
+            </div>
         </div>
-        <div class="col-4">
-            <label>Cost ($)</label>
-            <input type="number" step="0.01" class="form-control" required>
-        </div>
-    </div>
 
-    <!--Description-->
-    <div class="row" style="margin-top: 25px">
-        <div class="col-12">
-            <label>Description</label>
-            <textarea class="form-control" rows="4" style="resize: none;" required></textarea>
+        <!--Description-->
+        <div class="row" style="margin-top: 25px">
+            <div class="col-12">
+                <label>Description</label>
+                <textarea class="form-control" rows="4" style="resize: none;" required></textarea>
+            </div>
         </div>
-    </div>
 
-    <!--Category-->
-    <div class="row" style="margin-top: 25px">
-        <div class="col-12">
-            <label>Category</label>
-            <select required>
-                <option value="" selected disabled hidden>Choose...</option>
-                <option v-for="category in category_list" :value="category.id">
-                    [[ category.name ]]
-                </option>
-            </select>
+        <!--Category-->
+        <div class="row" style="margin-top: 25px">
+            <div class="col-12">
+                <label>Category</label>
+                <select required>
+                    <option value="" selected disabled hidden>Choose...</option>
+                    <option v-for="category in category_list" :value="category.id">
+                        [[ category.name ]]
+                    </option>
+                </select>
+            </div>
         </div>
-    </div>
 
-    <!--Image Dialog-->
-    <div class="row" style="margin-top: 25px">
-        <div class="col-8">
-            <label>Upload Image</label>
-            <input type="file" class="form-control"
-                   accept=".jpg,.png,.jfif"
-                   onchange="validateSize()"
-                   style="width: 89%"
-            >
-        </div>
-    </div>
+            <!--Image Dialog-->
+            <div class="row" style="margin-top: 25px">
+                <div class="col-12">
+                    <label>Drag-Drop Image (optional)</label>
+                    <input type="file" class="dropzone"
+                           style="width: 100%; height: 200px; border-style: dashed; background-color: transparent;"
+                    >
+                </div>
+            </div>
 
-    <div class="row" style="margin-top: 25px;">
-        <div class="col-12">
-            <button @click="submitForm"
-                    class="text-white btn-primary font-medium rounded-lg text-md px-3.5 py-2 inline-flex items-center">
-                Submit
-            </button>
-            <button @click="resetForm"
-                    class="text-white btn-primary font-medium rounded-lg text-md px-3.5 py-2 inline-flex items-center">
-                Reset
-            </button>
+        <div class="row" style="margin-top: 25px;">
+            <div class="col-12">
+                <button @click="submitForm"
+                        class="text-white btn-primary font-medium rounded-lg text-md px-3.5 py-2 inline-flex items-center">
+                    Submit
+                </button>
+                <button @click="resetForm"
+                        class="text-white btn-primary font-medium rounded-lg text-md px-3.5 py-2 inline-flex items-center">
+                    Reset
+                </button>
+            </div>
         </div>
-    </div>
 </div>
 
