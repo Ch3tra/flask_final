@@ -52,11 +52,11 @@
                 </li>
 
                 <!--CUSTOMER PART-->
-                <li class="nav-header">CUSTOMERS</li>
+                <li class="nav-header">STUDENTS</li>
                 <li class="nav-item">
-                    <a href="" class="nav-link{% if request.path == '/admin/customer' %} active{% endif %}">
-                        <i class="nav-icon fas fa-users"></i>
-                        <p>Customer lists</p>
+                    <a href="{{ url_for('students.student') }}" class="nav-link{% if request.path == '/admin/student' %} active{% endif %}">
+                        <i class="nav-icon fas fa-user-friends"></i>
+                        <p>Student lists</p>
                     </a>
                 </li>
             </ul>

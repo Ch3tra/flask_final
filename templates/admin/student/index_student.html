@@ -1,0 +1,94 @@
+<!--Bar -->
+<div class="content-header">
+    <div class="row">
+        <div class="col-6">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div style="display: flex;" class="col-sm-6">
+                        <i class="fas fa-user-friends fa-2x"
+                           style="margin-top: 2px; margin-right: 10px;"></i>
+                        <h1 class="m-0">STUDENT LIST</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <button @click="goTo('addstudent')" style="float: right; margin-right: 50px"
+                    class="text-white btn-primary font-medium rounded-lg text-md px-3.5 py-2 inline-flex items-center">
+                <i class="fas fa-plus-circle" style="margin-right: 7px; margin-top: 2px;"></i>
+                Add New Student
+            </button>
+        </div>
+    </div>
+</div>
+
+<!--Table-->
+<div class="content" style="padding-right: 30px">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12 lg-12">
+                <div class="overflow-x-auto">
+                    <div class="bg-gray-100 flex items-center justify-center bg-gray-100 font-sans overflow-hidden">
+                        <div class="w-full lg:w-6/6">
+                            <table class="min-w-max w-full table-auto">
+                                <thead>
+                                <tr class="bg-gray-200 text-gray-500 uppercase text-sm leading-normal">
+                                    <th class="py-3 px-6 text-left">Name</th>
+                                    <th class="py-3 px-6 text-center">Picture</th>
+                                    <th class="py-3 px-6 text-center">Subject</th>
+                                    <th class="py-3 px-6 text-center">Gender</th>
+                                    <th class="py-3 px-6 text-center">Birthday</th>
+                                    <th class="py-3 px-6 text-center">Email</th>
+                                    <th class="py-3 px-6 text-center">Phone</th>
+                                    <th class="py-3 px-6 text-center">Actions</th>
+                                </tr>
+                                </thead>
+
+                                <tbody v-for="(item, index) in paginatedItems" :key="index">
+                                <tr>
+                                    <td class="py-3 px-6 text-left">[[ item.firstName ]] [[ item.lastName ]]</td>
+                                    <td class="py-3 px-6 text-center">
+                                        <div class="flex items-center justify-center">
+                                            <img class="w-8 h-8 rounded-full border-gray-200 border transform hover:scale-150"
+                                                 :src="getImageSrc(item.image)"/>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-6 text-center">[[ item.subject ]]</td>
+                                    <td class="py-3 px-6 text-center">[[ item.gender ]]</td>
+                                    <td class="py-3 px-6 text-center">[[ item.birthday ]]</td>
+                                    <td class="py-3 px-6 text-center">[[ item.email ]]</td>
+                                    <td class="py-3 px-6 text-center">[[ item.phoneNumber ]]</td>
+
+                                    <td class="py-3 px-6 text-center">
+                                        <div class="flex item-center justify-center"
+                                             style="margin-top: 5px; margin-left: 12px">
+                                            <div class="w-5 mr-2.5 transform hover:text-blue-500 hover:scale-110">
+                                                <button @click="goToDetails(item.id)" title="Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                            <div class="w-5 mr-2.5 transform hover:text-blue-500 hover:scale-110">
+                                                <button @click="goToEdits(item.id)" title="Modify">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </div>
+                                            <div class="w-5 mr-2.5 transform hover:text-red-500 hover:scale-110">
+                                                <button @click="deleteForm(item.id, item.image)" title="Delete">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Pagination -->
+{% include 'admin/include/pagination.html' %}

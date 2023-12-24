@@ -1,0 +1,102 @@
+<!--Bar -->
+<div class="content-header">
+    <div class="row">
+        <div class="col-6">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div style="display: flex;" class="col-sm-6">
+                        <i class="fas fa-user-friends fa-2x"
+                           style="margin-top: 2px; margin-right: 10px;"></i>
+                        <h1 class="m-0">ADD STUDENT</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <button @click="goTo('index')" style="float: right; margin-right: 30px"
+                    class="text-white btn-primary font-medium rounded-lg text-md px-3.5 py-2 inline-flex items-center">
+                <i class="fas fa-plus-circle" style="margin-right: 7px; margin-top: 2px;"></i>
+                GO BACK
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="max-width: 900px;">
+    <!--Name-->
+    <div class="row" style="margin-top: 25px">
+        <div class="col-6">
+            <label>First-Name</label>
+            <input v-model="firstName" type="text" class="form-control" :class="{ 'error-field': errors.firstName }">
+            <p v-if="errors.firstName" class="error-msg" style="color: red">[[ errors.firstName ]]</p>
+        </div>
+        <div class="col-6">
+            <label>Last-Name</label>
+            <input v-model="lastName" type="text" class="form-control" :class="{ 'error-field': errors.lastName }">
+            <p v-if="errors.lastName" class="error-msg" style="color: red">[[ errors.lastName ]]</p>
+        </div>
+    </div>
+
+    <!--Gender & Birthday-->
+    <div class="row" style="margin-top: 25px">
+        <div class="col-4">
+            <label>Gender</label>
+            <input v-model="gender" type="text" class="form-control" :class="{ 'error-field': errors.gender }">
+            <p v-if="errors.gender" class="error-msg" style="color: red">[[ errors.gender ]]</p>
+        </div>
+        <div class="col-8">
+            <label>Birthday</label>
+            <input v-model="birthday" type="date" class="form-control" :class="{ 'error-field': errors.birthday }">
+            <p v-if="errors.birthday" class="error-msg" style="color: red">[[ errors.birthday ]]</p>
+        </div>
+    </div>
+
+    <!--Email & Phone-->
+    <div class="row" style="margin-top: 25px">
+        <div class="col-6">
+            <label>Email</label>
+            <input v-model="email" type="email" class="form-control" :class="{ 'error-field': errors.email }">
+            <p v-if="errors.email" class="error-msg" style="color: red">[[ errors.email ]]</p>
+        </div>
+        <div class="col-6">
+            <label>Phone</label>
+            <input v-model="phone" type="tel" class="form-control" :class="{ 'error-field': errors.phone }">
+            <p v-if="errors.phone" class="error-msg" style="color: red">[[ errors.phone ]]</p>
+        </div>
+    </div>
+
+    <!--Subject-->
+    <div class="row" style="margin-top: 25px">
+        <div class="col-6">
+            <label>Subject</label>
+            <input v-model="subject" type="text" class="form-control" :class="{ 'error-field': errors.subject }">
+            <p v-if="errors.subject" class="error-msg" style="color: red">[[ errors.subject ]]</p>
+        </div>
+    </div>
+
+    <!--Image Dialog-->
+    <div class="row" style="margin-top: 25px">
+        <div class="col-12">
+            <label>Drag-Drop Image (optional)</label>
+            <input type="file" class="dropzone" :class="{ 'error-field': errors.image }"
+                   style="width: 100%; height: 200px; border-style: dashed; background-color: transparent;"
+                   @change="handleFileChange"
+            >
+            <p v-if="errors.image" class="error-msg" style="color: red">[[ errors.image ]]</p>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top: 25px;">
+        <div class="col-12">
+            <button @click="submitForm"
+                    class="text-white btn-primary font-medium rounded-lg text-md px-3.5 py-2 inline-flex items-center">
+                Submit
+            </button>
+            <button @click="resetForm"
+                    class="text-white btn-primary font-medium rounded-lg text-md px-3.5 py-2 inline-flex items-center">
+                Reset
+            </button>
+        </div>
+    </div>
+</div>
+

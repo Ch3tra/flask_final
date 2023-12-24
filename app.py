@@ -8,6 +8,8 @@ from route.product.apiProduct import apiD
 from route.product.category import categories
 from route.product.pos import poss
 from route.product.product import products
+from route.student.apiStudent import apiS
+from route.student.student import students
 
 app = Flask(__name__)
 
@@ -19,6 +21,7 @@ login_manager.login_view = "auths.login"
 
 
 app.config['UPLOAD_FOLDER_PRODUCT'] = 'static/img/product'
+app.config['UPLOAD_FOLDER_STUDENT'] = 'static/img/student'
 
 app.register_blueprint(products)
 app.register_blueprint(categories)
@@ -26,6 +29,8 @@ app.register_blueprint(apiD)
 app.register_blueprint(apiC)
 app.register_blueprint(apiFD)
 app.register_blueprint(poss)
+app.register_blueprint(students)
+app.register_blueprint(apiS)
 app.register_blueprint(auths, url_prefix='/auth')
 
 
