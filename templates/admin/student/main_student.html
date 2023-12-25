@@ -16,10 +16,10 @@
         <div v-if="studentContent == 'detailstudent'">
             {% include 'admin/student/detail_student.html' %}
         </div>
-        {##}
-        {#        <div v-if="studentContent == 'editstudent'">#}
-        {#            {% include 'admin/student/edit_student.html' %}#}
-        {#        </div>#}
+
+        <div v-if="studentContent == 'editstudent'">
+            {% include 'admin/student/edit_student.html' %}
+        </div>
 
     </div>
 
@@ -113,13 +113,27 @@
                     event.target.style.transform = 'scale(1)';
                     event.target.style.boxShadow = '0 10px 15px rgba(0, 0, 0, 0.1)';
                 },
-                // navigate to add page and back for button
-                goTo(page) {
-                    if (page == 'addstudent') {
+                // navigate to page
+                goTo(page, id) {
+                    if (page == 'index' && id === '') {
+                        this.studentContent = 'index';
+                        this.resetForm();
+                        this.getStudents();
+                    }
+                    if (page == 'addstudent' && id === '') {
                         this.studentContent = 'addstudent';
                     }
-                    if (page == 'index') {
-                        this.studentContent = 'index';
+                    if (page == 'detailstudent') {
+                        // Filter the student_list to get details of the selected product by id
+                        this.detail_list = this.student_list.filter(student => student.id === id);
+                        // Set the studentContent to 'detailstudent' to display the details view
+                        this.studentContent = 'detailstudent';
+                    }
+                    if (page == 'editstudent') {
+                        // Filter the student_list to get details of the selected student by id
+                        this.detail_list = this.student_list.filter(student => student.id === id);
+                        // Set the studentContent to 'editstudent' to display the details view
+                        this.studentContent = 'editstudent';
                     }
                 },
                 // reset and submit method add student for button
@@ -132,6 +146,7 @@
                     this.phone = '';
                     this.subject = '';
                     this.errors = {};
+                    this.detail_list = [];
 
                     // Reset file input (image)
                     const fileInput = document.querySelector('input[type="file"]');
@@ -148,202 +163,223 @@
                 handleFileChange(event) {
                     // Handle file change event when a file is selected
                     const selectedFile = event.target.files[0]; // Get the selected file
-                    this.image = selectedFile; // Store the selected file in the 'image' property
+                    this.image = selectedFile;
+                    this.detail_list[0].image = selectedFile;
                 },
-                submitForm() {
+                // handle add and edit form submit
+                submitForm(type, sid) {
                     this.errors = {}; // Reset errors
                     let isValid = true;
 
-                    // validate name with pattern and length
-                    if (!this.firstName) {
-                        this.errors.firstName = 'First Name is required';
-                        isValid = false;
-                    } else if (!/^[A-Za-z ]+$/.test(this.firstName)) {
-                        this.errors.firstName = 'Only characters and spaces are allowed';
-                        isValid = false;
-                    } else if (this.firstName.length > 20) {
-                        this.errors.firstName = 'First Name should not exceed 20 characters';
-                        isValid = false;
-                    }
-
-                    if (!this.lastName) {
-                        this.errors.lastName = 'Last Name is required';
-                        isValid = false;
-                    } else if (!/^[A-Za-z ]+$/.test(this.lastName)) {
-                        this.errors.lastName = 'Only characters and spaces are allowed';
-                        isValid = false;
-                    } else if (this.lastName.length > 30) {
-                        this.errors.lastName = 'Last Name should not exceed 30 characters';
-                        isValid = false;
-                    }
-
-                    // validate gender only male or female
-                    if (!this.gender) {
-                        this.errors.gender = 'Gender is required. Only Male or Female.';
-                        isValid = false;
-                    } else if (!/(Male|Female)/.test(this.gender) && !/(male|female)/.test(this.gender)) {
-                        this.errors.gender = 'Invalid gender';
-                        isValid = false;
-                    }
-
-                    // validate birthday
-                    if (!this.birthday) {
-                        this.errors.birthday = 'Birthday is required';
-                        isValid = false;
-                    }
-
-                    // validate email with pattern
-                    if (!this.email) {
-                        this.errors.email = 'Email is required';
-                        isValid = false;
-                    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
-                        this.errors.email = 'Invalid email format';
-                        isValid = false;
-                    }
-
-                    // validate phone with pattern
-                    if (!this.phone) {
-                        this.errors.phone = 'Phone is required';
-                        isValid = false;
-                    } else if (!/^0[0-9]{2}[0-9]{3}[0-9]{3}$/.test(this.phone) && !/^0[0-9]{2}[0-9]{3}[0-9]{4}$/.test(this.phone)) {
-                        this.errors.phone = 'Phone should be in the format: 0xx xxx xxx (x)';
-                        isValid = false;
-                    }
-
-                    // validate subject
-                    if (!this.subject) {
-                        this.errors.subject = 'Subject is required';
-                        isValid = false;
-                    }
-
-                    if (this.image) {
-                        const allowedExtensions = ['jpg', 'jpeg', 'png', 'jfif'];
-                        const fileExtension = this.image.name.split('.').pop().toLowerCase();
-
-                        if (!allowedExtensions.includes(fileExtension)) {
-                            this.errors.image = 'Invalid file type. Please upload an image (jpg, jpeg, png, jfif).';
+                    if (type === 'add') {
+                        // validate name with pattern and length
+                        if (!this.firstName) {
+                            this.errors.firstName = 'First Name is required';
                             isValid = false;
-                        } else if (this.image.size / (1024 * 1024) > 2) {
-                            this.errors.image = 'Invalid file size. Please upload an image less than 2MB.';
+                        } else if (!/^[A-Za-z ]+$/.test(this.firstName)) {
+                            this.errors.firstName = 'Only characters and spaces are allowed';
+                            isValid = false;
+                        } else if (this.firstName.length > 20) {
+                            this.errors.firstName = 'First Name should not exceed 20 characters';
                             isValid = false;
                         }
-                    }
 
-                    if (isValid) {
-                        // Create a FormData object to send both form data and the image file
-                        const formData = new FormData();
-                        formData.append('firstName', this.firstName);
-                        formData.append('lastName', this.lastName);
-                        formData.append('gender', this.gender);
-                        formData.append('birthday', this.birthday);
-                        formData.append('email', this.email);
-                        formData.append('phone', this.phone);
-                        formData.append('subject', this.subject);
-                        formData.append('image_upload', this.image); // Assuming this.image contains the image file
+                        if (!this.lastName) {
+                            this.errors.lastName = 'Last Name is required';
+                            isValid = false;
+                        } else if (!/^[A-Za-z ]+$/.test(this.lastName)) {
+                            this.errors.lastName = 'Only characters and spaces are allowed';
+                            isValid = false;
+                        } else if (this.lastName.length > 30) {
+                            this.errors.lastName = 'Last Name should not exceed 30 characters';
+                            isValid = false;
+                        }
 
-                        axios.post('http://127.0.0.1:5000/admin/student_added', formData, {
-                            headers: {
-                                'Content-Type': 'multipart/form-data'
+                        // validate gender only male or female
+                        if (!this.gender) {
+                            this.errors.gender = 'Gender is required. Only Male or Female.';
+                            isValid = false;
+                        } else if (!/(Male|Female)/.test(this.gender) && !/(male|female)/.test(this.gender)) {
+                            this.errors.gender = 'Invalid gender';
+                            isValid = false;
+                        }
+
+                        // validate birthday
+                        if (!this.birthday) {
+                            this.errors.birthday = 'Birthday is required';
+                            isValid = false;
+                        }
+
+                        // validate email with pattern
+                        if (!this.email) {
+                            this.errors.email = 'Email is required';
+                            isValid = false;
+                        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
+                            this.errors.email = 'Invalid email format';
+                            isValid = false;
+                        }
+
+                        // validate phone with pattern
+                        if (!this.phone) {
+                            this.errors.phone = 'Phone is required';
+                            isValid = false;
+                        } else if (!/^0[0-9]{2}[0-9]{3}[0-9]{3}$/.test(this.phone) && !/^0[0-9]{2}[0-9]{3}[0-9]{4}$/.test(this.phone)) {
+                            this.errors.phone = 'Phone should be in number with format: 0xx xxx xxx (x)';
+                            isValid = false;
+                        }
+
+                        // validate subject
+                        if (!this.subject) {
+                            this.errors.subject = 'Subject is required';
+                            isValid = false;
+                        }
+
+                        if (this.image) {
+                            const allowedExtensions = ['jpg', 'jpeg', 'png', 'jfif'];
+                            const fileExtension = this.image.name.split('.').pop().toLowerCase();
+
+                            if (!allowedExtensions.includes(fileExtension)) {
+                                this.errors.image = 'Invalid file type. Please upload an image (jpg, jpeg, png, jfif).';
+                                isValid = false;
+                            } else if (this.image.size / (1024 * 1024) > 2) {
+                                this.errors.image = 'Invalid file size. Please upload an image less than 2MB.';
+                                isValid = false;
                             }
-                        })
-                            .then(response => {
-                                console.log('API Response:', response.data);
-                                this.getStudents();
-                                this.resetForm();
-                                this.studentContent = 'index';
-                            })
-                            .catch(error => {
-                                console.error('API Error:', error);
-                            });
-                    } else {
-                        console.log('Fail to add student.')
-                    }
-                },
-                // navigate to edit page with id and save or edit student method for button
-                goToEdits(id) {
-                    // Filter the student_list to get details of the selected student by id
-                    this.detail_list = this.student_list.filter(student => student.id === id);
-                    // Set the studentContent to 'editstudent' to display the details view
-                    this.studentContent = 'editstudent';
-                },
-                editForm(id) {
-                    const pid = id;
-                    const name = document.querySelector('input[type="text"]').value;
-                    const cost = document.querySelector('input[type="number"]').value;
-                    const description = document.querySelector('textarea').value;
-                    const category = document.querySelector('select').value;
-
-                    // Define patterns for each field (modify as needed)
-                    const namePattern = /^[A-Za-z\s]+$/; // Only letters and spaces
-                    const costPattern = /^\d+(\.\d{1,2})?$/; // Decimal number with up to 2 decimal places
-                    const descriptionPattern = /^.{10,}$/; // Minimum 10 characters for description
-
-                    // Define error messages for each field (modify as needed)
-                    const errorMessage = {
-                        name: 'Invalid name (letters and spaces only)',
-                        cost: 'Invalid cost (* or *.**)',
-                        description: 'Invalid description (minimum 10 letters)',
-                        category: 'Please select a category'
-                    };
-
-                    // Perform manual validation for each field
-                    const missingFields = [];
-                    if (!name || !namePattern.test(name)) {
-                        missingFields.push(errorMessage.name);
-                    }
-                    if (!cost || !costPattern.test(cost)) {
-                        missingFields.push(errorMessage.cost);
-                    }
-                    if (!description || !descriptionPattern.test(description)) {
-                        missingFields.push(errorMessage.description);
-                    }
-                    if (!category) {
-                        missingFields.push(errorMessage.category);
-                    }
-
-                    // If any field is missing or doesn't match the pattern, alert about the issue
-                    if (missingFields.length > 0) {
-                        const errorMessage = missingFields.join('<br><br>');
-                        Swal.fire({
-                            title: "Oops...",
-                            html: `Please fill or check the following:<br><br>${errorMessage}`,
-                        });
-                        return; // Stop further execution if validation fails
-                    }
-
-                    // Get the file input element and its selected file
-                    const fileInput = document.querySelector('input[type="file"]');
-                    const imageFile = fileInput.files[0];
-
-                    // Create a FormData object to send both form data and the image file
-                    const formData = new FormData();
-                    formData.append('id', pid);
-                    formData.append('name', name);
-                    formData.append('cost', cost);
-                    formData.append('description', description);
-                    formData.append('category', category);
-                    formData.append('image_upload', imageFile);
-
-                    axios.post('http://127.0.0.1:5000/admin/product_edit', formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data'
                         }
-                    })
-                        .then(response => {
-                            console.log('Product edited successfully:', response.data);
-                            this.getStudents();
-                            this.studentContent = 'index';
-                        })
-                        .catch(error => {
-                            console.error('Error editing product:', error);
-                        });
-                },
-                // navigate to detail page with id
-                goToDetails(id) {
-                    // Filter the student_list to get details of the selected product by id
-                    this.detail_list = this.student_list.filter(student => student.id === id);
-                    // Set the studentContent to 'detailstudent' to display the details view
-                    this.studentContent = 'detailstudent';
+
+                        if (isValid) {
+                            // Create a FormData object to send both form data and the image file
+                            const formData = new FormData();
+                            formData.append('firstName', this.firstName);
+                            formData.append('lastName', this.lastName);
+                            formData.append('gender', this.gender);
+                            formData.append('birthday', this.birthday);
+                            formData.append('email', this.email);
+                            formData.append('phone', this.phone);
+                            formData.append('subject', this.subject);
+                            formData.append('image_upload', this.image);
+
+                            axios.post('http://127.0.0.1:5000/admin/student_added', formData, {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data'
+                                }
+                            })
+                                .then(response => {
+                                    console.log('API Response:', response.data);
+                                    this.getStudents();
+                                    this.resetForm();
+                                    this.studentContent = 'index';
+                                })
+                                .catch(error => {
+                                    console.error('API Error:', error);
+                                });
+                        }
+
+                    } else if (type === 'edit') {
+                        // validate name with pattern and length
+                        if (!this.detail_list[0].firstName) {
+                            this.errors.firstName = 'First Name is required';
+                            isValid = false;
+                        } else if (!/^[A-Za-z ]+$/.test(this.detail_list[0].firstName)) {
+                            this.errors.firstName = 'Only characters and spaces are allowed';
+                            isValid = false;
+                        } else if (this.detail_list[0].firstName.length > 20) {
+                            this.errors.firstName = 'First Name should not exceed 20 characters';
+                            isValid = false;
+                        }
+
+                        if (!this.detail_list[0].lastName) {
+                            this.errors.lastName = 'Last Name is required';
+                            isValid = false;
+                        } else if (!/^[A-Za-z ]+$/.test(this.detail_list[0].lastName)) {
+                            this.errors.lastName = 'Only characters and spaces are allowed';
+                            isValid = false;
+                        } else if (this.detail_list[0].lastName.length > 30) {
+                            this.errors.lastName = 'Last Name should not exceed 30 characters';
+                            isValid = false;
+                        }
+
+                        // validate gender only male or female
+                        if (!this.detail_list[0].gender) {
+                            this.errors.gender = 'Gender is required. Only Male or Female.';
+                            isValid = false;
+                        } else if (!/(Male|Female)/.test(this.detail_list[0].gender) && !/(male|female)/.test(this.detail_list[0].gender)) {
+                            this.errors.gender = 'Invalid gender';
+                            isValid = false;
+                        }
+
+                        // validate birthday
+                        if (!this.detail_list[0].birthday) {
+                            this.errors.birthday = 'Birthday is required';
+                            isValid = false;
+                        }
+
+                        // validate email with pattern
+                        if (!this.detail_list[0].email) {
+                            this.errors.email = 'Email is required';
+                            isValid = false;
+                        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.detail_list[0].email)) {
+                            this.errors.email = 'Invalid email format';
+                            isValid = false;
+                        }
+
+                        // validate phone with pattern
+                        if (!this.detail_list[0].phoneNumber) {
+                            this.errors.phone = 'Phone is required';
+                            isValid = false;
+                        } else if (!/^0[0-9]{2}[0-9]{3}[0-9]{3}$/.test(this.detail_list[0].phoneNumber) && !/^0[0-9]{2}[0-9]{3}[0-9]{4}$/.test(this.detail_list[0].phoneNumber)) {
+                            this.errors.phone = 'Phone should be in number with format: 0xx xxx xxx (x)';
+                            isValid = false;
+                        }
+
+                        // validate subject
+                        if (!this.detail_list[0].subject) {
+                            this.errors.subject = 'Subject is required';
+                            isValid = false;
+                        }
+
+                        if (this.detail_list[0].image) {
+                            const allowedExtensions = ['jpg', 'jpeg', 'png', 'jfif'];
+                            const fileExtension = this.image.name.split('.').pop().toLowerCase();
+
+                            if (!allowedExtensions.includes(fileExtension)) {
+                                this.errors.image = 'Invalid file type. Please upload an image (jpg, jpeg, png, jfif).';
+                                isValid = false;
+                            } else if (this.image.size / (1024 * 1024) > 2) {
+                                this.errors.image = 'Invalid file size. Please upload an image less than 2MB.';
+                                isValid = false;
+                            }
+                        }
+
+                        if (isValid) {
+                            // Create a FormData object to send both form data and the image file
+                            const formData = new FormData();
+                            formData.append('firstName', this.detail_list[0].firstName);
+                            formData.append('lastName', this.detail_list[0].lastName);
+                            formData.append('gender', this.detail_list[0].gender);
+                            formData.append('birthday', this.detail_list[0].birthday);
+                            formData.append('email', this.detail_list[0].email);
+                            formData.append('phone', this.detail_list[0].phoneNumber);
+                            formData.append('subject', this.detail_list[0].subject);
+                            formData.append('id', ssid);
+                            formData.append('image_upload', this.detail_list[0].image);
+
+                            axios.post('http://127.0.0.1:5000/admin/student_edited', formData, {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data'
+                                }
+                            })
+                                .then(response => {
+                                    console.log('API Response:', response.data);
+                                    this.getStudents();
+                                    this.resetForm();
+                                    this.studentContent = 'index';
+                                })
+                                .catch(error => {
+                                    console.error('API Error:', error);
+                                });
+                        }
+                    }
                 },
                 // delete student
                 deleteForm(id, image) {
