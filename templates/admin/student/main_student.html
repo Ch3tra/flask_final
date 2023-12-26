@@ -23,7 +23,7 @@
 
     </div>
 
-    {#    custom style for some input field#}
+    {#custom style for some input field#}
     <style>
         .error-field {
             border: 1px solid red;
@@ -116,9 +116,9 @@
                 // navigate to page
                 goTo(page, id) {
                     if (page == 'index' && id === '') {
-                        this.studentContent = 'index';
-                        this.resetForm();
                         this.getStudents();
+                        this.resetForm();
+                        this.studentContent = 'index';
                     }
                     if (page == 'addstudent' && id === '') {
                         this.studentContent = 'addstudent';
@@ -164,7 +164,6 @@
                     // Handle file change event when a file is selected
                     const selectedFile = event.target.files[0]; // Get the selected file
                     this.image = selectedFile;
-                    this.detail_list[0].image = selectedFile;
                 },
                 // handle add and edit form submit
                 submitForm(type, sid) {
@@ -266,15 +265,12 @@
                             })
                                 .then(response => {
                                     console.log('API Response:', response.data);
-                                    this.getStudents();
-                                    this.resetForm();
-                                    this.studentContent = 'index';
+                                    this.goTo('index', '')
                                 })
                                 .catch(error => {
                                     console.error('API Error:', error);
                                 });
                         }
-
                     } else if (type === 'edit') {
                         // validate name with pattern and length
                         if (!this.detail_list[0].firstName) {
@@ -338,7 +334,7 @@
                             isValid = false;
                         }
 
-                        if (this.detail_list[0].image) {
+                        if (this.image) {
                             const allowedExtensions = ['jpg', 'jpeg', 'png', 'jfif'];
                             const fileExtension = this.image.name.split('.').pop().toLowerCase();
 
@@ -361,8 +357,10 @@
                             formData.append('email', this.detail_list[0].email);
                             formData.append('phone', this.detail_list[0].phoneNumber);
                             formData.append('subject', this.detail_list[0].subject);
-                            formData.append('id', ssid);
-                            formData.append('image_upload', this.detail_list[0].image);
+                            formData.append('id', sid);
+                            if (this.image) {
+                                formData.append('image_upload', this.image);
+                            }
 
                             axios.post('http://127.0.0.1:5000/admin/student_edited', formData, {
                                 headers: {
@@ -371,9 +369,7 @@
                             })
                                 .then(response => {
                                     console.log('API Response:', response.data);
-                                    this.getStudents();
-                                    this.resetForm();
-                                    this.studentContent = 'index';
+                                    this.goTo('index', '')
                                 })
                                 .catch(error => {
                                     console.error('API Error:', error);
@@ -383,12 +379,9 @@
                 },
                 // delete student
                 deleteForm(id, image) {
-                    const pid = id;
-                    const pimage = image;
-
                     const formData = new FormData();
-                    formData.append('id', pid);
-                    formData.append('image', pimage);
+                    formData.append('id', id);
+                    formData.append('image', image);
 
                     Swal.fire({
                         title: "Are you sure?",
@@ -400,15 +393,14 @@
                         confirmButtonText: "Yes, delete it!"
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            axios.post('http://127.0.0.1:5000/admin/product_delete', formData, {
+                            axios.post('http://127.0.0.1:5000/admin/student_delete', formData, {
                                 headers: {
                                     'Content-Type': 'multipart/form-data'
                                 }
                             })
                                 .then(response => {
                                     console.log('Product deleted successfully:', response.data);
-                                    this.getStudents();
-                                    this.studentContent = 'index';
+                                    this.goTo('index', '')
                                 })
                                 .catch(error => {
                                     console.error('Error deleting product:', error);
