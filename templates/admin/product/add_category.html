@@ -13,7 +13,7 @@
             </div>
         </div>
         <div class="col-6">
-            <button @click="goTo('index')" style="float: right; margin-right: 30px"
+            <button @click="goTo('index', '')" style="float: right; margin-right: 30px"
                     class="text-white btn-primary font-medium rounded-lg text-md px-3.5 py-2 inline-flex items-center">
                 <i class="fas fa-plus-circle" style="margin-right: 7px; margin-top: 2px;"></i>
                 GO BACK
@@ -27,7 +27,8 @@
     <div class="row" style="margin-top: 25px">
         <div class="col-12">
             <label>Name</label>
-            <input type="text" class="form-control" required style="width: 50%" maxlength="60">
+            <input v-model="name" type="text" class="form-control" :class="{ 'error-field': errors.name }">
+            <p v-if="errors.name" class="error-msg" style="color: red">[[ errors.name ]]</p>
         </div>
     </div>
 
@@ -35,13 +36,14 @@
     <div class="row" style="margin-top: 25px">
         <div class="col-12">
             <label>Description</label>
-            <textarea class="form-control" rows="6" style="resize: none;" required></textarea>
+            <textarea v-model="desc" class="form-control" rows="6" :class="{ 'error-field': errors.desc }"></textarea>
+            <p v-if="errors.desc" class="error-msg" style="color: red">[[ errors.desc ]]</p>
         </div>
     </div>
 
     <div class="row" style="margin-top: 25px;">
         <div class="col-12">
-            <button @click="submitForm"
+            <button @click="submitForm('add', '')"
                     class="text-white btn-primary font-medium rounded-lg text-md px-3.5 py-2 inline-flex items-center">
                 Submit
             </button>

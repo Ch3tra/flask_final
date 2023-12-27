@@ -29,7 +29,7 @@ def getAllCategory():
 def category_added():
     try:
         name = request.form['name']
-        description = request.form['description']
+        description = request.form['desc']
 
         query = "INSERT INTO category (categoryName, categoryDesc) VALUES (%s, %s)"
         params = (name, description)
@@ -47,7 +47,7 @@ def category_edit():
     try:
         pid = request.form['id']
         name = request.form['name']
-        description = request.form['description']
+        description = request.form['desc']
 
         query = f"UPDATE category SET " \
                 f"categoryName = %s, " \
@@ -66,10 +66,10 @@ def category_edit():
 @login_required
 def category_delete():
     try:
-        pid = request.form['id']
+        cid = request.form['id']
 
         query = f"DELETE FROM category WHERE categoryId = %s"
-        execute_query(query, (pid,), is_insert=True)
+        execute_query(query, (cid,), is_insert=True)
 
         return jsonify({'message': 'Category deleted successfully'}), 201
     except Exception as e:

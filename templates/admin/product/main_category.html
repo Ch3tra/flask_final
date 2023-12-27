@@ -23,6 +23,14 @@
 
     </div>
 
+    {#custom style for some input field#}
+    <style>
+        .error-field {
+            border: 1px solid red;
+            /* Other styles to highlight the error field */
+        }
+    </style>
+
     <script>
         var vue_obj = new Vue({
             el: '#app',
@@ -34,6 +42,9 @@
                 currentPage: 1, // Current page number
                 itemsPerPage: 6, // Number of items per page
                 categoryContent: 'index', // set to 'index', for first page load
+                name: '',
+                desc: '',
+                errors: {}
             },
             created() {
                 //run first after refreshed
@@ -56,10 +67,9 @@
                 },
             },
             methods: {
-                // fetch all product and category from api
+                // fetch all category from api
                 getCategory() {
-                    // Axios API request to fetch data and assign to product_list
-                    // Axios API request to fetch data and assign to product_list
+                    // Axios API request to fetch data and assign to category_list
                     axios.get('http://127.0.0.1:5000/getAllCategory')
                         .then(response => {
                             this.category_list = response.data.cate;
@@ -85,147 +95,127 @@
                     }
                 },
                 // navigate to add page and back for button
-                goTo(page) {
-                    if (page == 'addcategory') {
+                goTo(page, id) {
+                    if (page == 'index' && id === '') {
+                        this.getCategory();
+                        this.categoryContent = 'index';
+                        this.resetForm();
+                    }
+                    if (page == 'addcategory' && id === '') {
                         this.categoryContent = 'addcategory';
                     }
-                    if (page == 'index') {
-                        this.categoryContent = 'index';
+                    if (page == 'detailcategory') {
+                        // Filter the category_list to get details of the selected cate by id
+                        this.detail_list = this.category_list.filter(cate => cate.id === id);
+                        // Set the categoryContent to 'detailproduct' to display the details view
+                        this.categoryContent = 'detailcategory';
+                    }
+                    if (page == 'editcategory') {
+                        // Filter the category_list to get details of the selected cate by id
+                        this.detail_list = this.category_list.filter(cate => cate.id === id);
+                        // Set the categoryContent to 'editproduct' to display the details view
+                        this.categoryContent = 'editcategory';
                     }
                 },
-                // reset and submit method add product for button
+                // reset for button
                 resetForm() {
-                    // Reset text inputs and text area
-                    document.querySelector('input[type="text"]').value = '';
-                    document.querySelector('textarea').value = '';
+                    this.name = '';
+                    this.desc = '';
+                    this.errors = {};
+                    this.detail_list = [];
                 },
-                submitForm() {
-                    const name = document.querySelector('input[type="text"]').value;
-                    const description = document.querySelector('textarea').value;
+                // handle add and edit form submit
+                submitForm(type, sid) {
+                    this.errors = {}; // Reset errors
+                    let isValid = true;
 
-                    // Define patterns for each field (modify as needed)
-                    const namePattern = /^[A-Za-z\s]+$/; // Only letters and spaces
-                    const descriptionPattern = /^.{10,}$/; // Minimum 10 characters for description
-
-                    // Define error messages for each field (modify as needed)
-                    const errorMessage = {
-                        name: 'Invalid name (letters and spaces only)',
-                        description: 'Invalid description (minimum 10 letters)',
-                    };
-
-                    // Perform manual validation for each field
-                    const missingFields = [];
-                    if (!name || !namePattern.test(name)) {
-                        missingFields.push(errorMessage.name);
-                    }
-                    if (!description || !descriptionPattern.test(description)) {
-                        missingFields.push(errorMessage.description);
-                    }
-
-                    // If any field is missing or doesn't match the pattern, alert about the issue
-                    if (missingFields.length > 0) {
-                        const errorMessage = missingFields.join('<br><br>');
-                        Swal.fire({
-                            title: "Oops...",
-                            html: `Please fill or check the following:<br><br>${errorMessage}`,
-                        });
-                        return; // Stop further execution if validation fails
-                    }
-
-
-                    // Create a FormData object to send both form data and the image file
-                    const formData = new FormData();
-                    formData.append('name', name);
-                    formData.append('description', description);
-
-                    axios.post('http://127.0.0.1:5000/admin/category_added', formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data'
+                    if (type === 'add') {
+                        // validate name with pattern and length
+                        if (!this.name) {
+                            this.errors.name = 'Name is required';
+                            isValid = false;
+                        } else if (!/^[A-Za-z ]+$/.test(this.name)) {
+                            this.errors.name = 'Only characters and spaces are allowed';
+                            isValid = false;
+                        } else if (this.name.length > 40) {
+                            this.errors.name = 'Name should not exceed 40 characters';
+                            isValid = false;
                         }
-                    })
-                        .then(response => {
-                            console.log('Category added successfully:', response.data);
-                            this.getCategory();
-                            this.categoryContent = 'index';
-                        })
-                        .catch(error => {
-                            console.error('Error adding product:', error);
-                        });
-                },
-                // navigate to edit page with id and save or edit product method for button
-                goToEdits(id) {
-                    // Filter the product_list to get details of the selected product by id
-                    this.detail_list = this.category_list.filter(cate => cate.id === id);
-                    // Set the categoryContent to 'editproduct' to display the details view
-                    this.categoryContent = 'editcategory';
-                },
-                editForm(id) {
-                    const pid = id;
-                    const name = document.querySelector('input[type="text"]').value;
-                    const description = document.querySelector('textarea').value;
 
-                    // Define patterns for each field (modify as needed)
-                    const namePattern = /^[A-Za-z\s]+$/; // Only letters and spaces
-                    const descriptionPattern = /^.{10,}$/; // Minimum 10 characters for description
-
-                    // Define error messages for each field (modify as needed)
-                    const errorMessage = {
-                        name: 'Invalid name (letters and spaces only)',
-                        description: 'Invalid description (minimum 10 letters)',
-                    };
-
-                    // Perform manual validation for each field
-                    const missingFields = [];
-                    if (!name || !namePattern.test(name)) {
-                        missingFields.push(errorMessage.name);
-                    }
-                    if (!description || !descriptionPattern.test(description)) {
-                        missingFields.push(errorMessage.description);
-                    }
-
-                    // If any field is missing or doesn't match the pattern, alert about the issue
-                    if (missingFields.length > 0) {
-                        const errorMessage = missingFields.join('<br><br>');
-                        Swal.fire({
-                            title: "Oops...",
-                            html: `Please fill or check the following:<br><br>${errorMessage}`,
-                        });
-                        return; // Stop further execution if validation fails
-                    }
-
-                    // Create a FormData object to send both form data and the image file
-                    const formData = new FormData();
-                    formData.append('id', pid);
-                    formData.append('name', name);
-                    formData.append('description', description);
-
-                    axios.post('http://127.0.0.1:5000/admin/category_edit', formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data'
+                        if (!this.desc) {
+                            this.errors.desc = 'Description is required';
+                            isValid = false;
+                        } else if (this.desc.length > 250) {
+                            this.errors.desc = 'Last Name should not exceed 250 characters';
+                            isValid = false;
                         }
-                    })
-                        .then(response => {
-                            console.log('Category edited successfully:', response.data);
-                            this.getCategory();
-                            this.categoryContent = 'index';
-                        })
-                        .catch(error => {
-                            console.error('Error editing category:', error);
-                        });
+
+                        if (isValid) {
+                            // Create a FormData object to send data
+                            const formData = new FormData();
+                            formData.append('name', this.name);
+                            formData.append('desc', this.desc);
+
+                            axios.post('http://127.0.0.1:5000/admin/category_added', formData, {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data'
+                                }
+                            })
+                                .then(response => {
+                                    console.log('API Response:', response.data);
+                                    this.goTo('index', '')
+                                })
+                                .catch(error => {
+                                    console.error('API Error:', error);
+                                });
+                        }
+                    } else if (type === 'edit') {
+                        // validate name with pattern and length
+                        if (!this.detail_list[0].name) {
+                            this.errors.name = 'First Name is required';
+                            isValid = false;
+                        } else if (!/^[A-Za-z ]+$/.test(this.detail_list[0].name)) {
+                            this.errors.name = 'Only characters and spaces are allowed';
+                            isValid = false;
+                        } else if (this.detail_list[0].name.length > 40) {
+                            this.errors.name = 'First Name should not exceed 40 characters';
+                            isValid = false;
+                        }
+
+                        if (!this.detail_list[0].desc) {
+                            this.errors.desc = 'Last Name is required';
+                            isValid = false;
+                        } else if (this.detail_list[0].desc.length > 250) {
+                            this.errors.desc = 'Last Name should not exceed 250 characters';
+                            isValid = false;
+                        }
+
+                        if (isValid) {
+                            // Create a FormData object to send data
+                            const formData = new FormData();
+                            formData.append('name', this.detail_list[0].name);
+                            formData.append('desc', this.detail_list[0].desc);
+                            formData.append('id', sid);
+
+                            axios.post('http://127.0.0.1:5000/admin/category_edit', formData, {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data'
+                                }
+                            })
+                                .then(response => {
+                                    console.log('API Response:', response.data);
+                                    this.goTo('index', '')
+                                })
+                                .catch(error => {
+                                    console.error('API Error:', error);
+                                });
+                        }
+                    }
                 },
-                // navigate to detail page with id
-                goToDetails(id) {
-                    // Filter the product_list to get details of the selected product by id
-                    this.detail_list = this.category_list.filter(cate => cate.id === id);
-                    // Set the categoryContent to 'detailproduct' to display the details view
-                    this.categoryContent = 'detailcategory';
-                },
-                // delete product
+                // delete category
                 deleteForm(id) {
-                    const pid = id;
-
                     const formData = new FormData();
-                    formData.append('id', pid);
+                    formData.append('id', id);
 
                     Swal.fire({
                         title: "Are you sure?",
@@ -244,8 +234,7 @@
                             })
                                 .then(response => {
                                     console.log('Category deleted successfully:', response.data);
-                                    this.getCategory();
-                                    this.categoryContent = 'index';
+                                    this.goTo('index', '')
                                 })
                                 .catch(error => {
                                     console.error('Error deleting product:', error);

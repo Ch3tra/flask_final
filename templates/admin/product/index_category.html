@@ -13,7 +13,7 @@
             </div>
         </div>
         <div class="col-6">
-            <button @click="goTo('addcategory')" style="float: right; margin-right: 30px"
+            <button @click="goTo('addcategory', '')" style="float: right; margin-right: 30px"
                     class="text-white btn-primary font-medium rounded-lg text-md px-3.5 py-2 inline-flex items-center">
                 <i class="fas fa-plus-circle" style="margin-right: 7px; margin-top: 2px;"></i>
                 Add New Category
@@ -48,12 +48,12 @@
                                         <div class="flex item-center justify-center"
                                              style="margin-top: 5px; margin-left: 12px">
                                             <div class="w-5 mr-2.5 transform hover:text-blue-500 hover:scale-110">
-                                                <button @click="goToDetails(item.id)" title="Details">
+                                                <button @click="goTo('detailcategory', item.id)" title="Details">
                                                     <i class="fas fa-eye"></i>
                                                 </button>
                                             </div>
                                             <div class="w-5 mr-2.5 transform hover:text-blue-500 hover:scale-110">
-                                                <button @click="goToEdits(item.id)" title="Modify">
+                                                <button @click="goTo('editcategory', item.id)" title="Modify">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                             </div>

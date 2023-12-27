@@ -13,7 +13,7 @@
             </div>
         </div>
         <div class="col-6">
-            <button @click="goTo('index')" style="float: right; margin-right: 30px"
+            <button @click="goTo('index', ' ')" style="float: right; margin-right: 30px"
                     class="text-white btn-primary font-medium rounded-lg text-md px-3.5 py-2 inline-flex items-center">
                 <i class="fas fa-plus-circle" style="margin-right: 7px; margin-top: 2px;"></i>
                 GO BACK
@@ -87,7 +87,7 @@
 
         <div class="row" style="margin-top: 25px;">
             <div class="col-12">
-                <button @click="goToEdits(detail_list[0].id)"
+                <button @click="goTo('editproduct', detail_list[0].id)"
                         class="text-white btn-primary font-medium rounded-lg text-md px-3.5 py-2 inline-flex items-center">
                     Edit
                 </button>

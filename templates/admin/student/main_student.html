@@ -73,7 +73,7 @@
                 },
             },
             methods: {
-                // fetch all student and category from api
+                // fetch all student from api
                 getStudents() {
                     // Axios API request to fetch data and assign to student_list
                     axios.get('http://127.0.0.1:5000/getAllStudent')
@@ -117,14 +117,14 @@
                 goTo(page, id) {
                     if (page == 'index' && id === '') {
                         this.getStudents();
-                        this.resetForm();
                         this.studentContent = 'index';
+                        this.resetForm();
                     }
                     if (page == 'addstudent' && id === '') {
                         this.studentContent = 'addstudent';
                     }
                     if (page == 'detailstudent') {
-                        // Filter the student_list to get details of the selected product by id
+                        // Filter the student_list to get details of the selected student by id
                         this.detail_list = this.student_list.filter(student => student.id === id);
                         // Set the studentContent to 'detailstudent' to display the details view
                         this.studentContent = 'detailstudent';
@@ -399,11 +399,11 @@
                                 }
                             })
                                 .then(response => {
-                                    console.log('Product deleted successfully:', response.data);
+                                    console.log('Student deleted successfully:', response.data);
                                     this.goTo('index', '')
                                 })
                                 .catch(error => {
-                                    console.error('Error deleting product:', error);
+                                    console.error('Error deleting student:', error);
                                 });
                         }
                     });

@@ -48,7 +48,7 @@ def getAllProduct():
 def product_added():
     try:
         name = request.form['name']
-        description = request.form['description']
+        description = request.form['desc']
         cost = request.form['cost']
         category = request.form['category']
 
@@ -86,7 +86,7 @@ def product_edit():
     try:
         pid = request.form['id']
         name = request.form['name']
-        description = request.form['description']
+        description = request.form['desc']
         cost = request.form['cost']
         category = request.form['category']
 
