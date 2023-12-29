@@ -101,7 +101,8 @@
                 },
                 // display image with image string from database
                 getImageSrc(imageName) {
-                    return `{{ url_for('static', filename='img/product/') }}${imageName.includes('.') ? imageName : imageName + '.jpg'}`;
+                    // add ??timestamp=${Date.now()}` to avoid cache image display since we save new image same name
+                    return `/static/img/product/${imageName.includes('.') ? imageName : imageName + '.jpg'}?timestamp=${Date.now()}`;
                 },
                 // big size image js
                 scaleImage(event) {
@@ -114,7 +115,7 @@
                 },
                 // navigate to add page and back for button
                 goTo(page, id) {
-                    if (page == 'index' && id === '') {
+                    if (page == 'index') {
                         this.getProducts();
                         this.productContent = 'index';
                         this.resetForm();
@@ -359,7 +360,6 @@
                             })
                                 .then(response => {
                                     console.log('Product deleted successfully:', response.data);
-                                    this.getProducts();
                                     this.productContent = 'index';
                                 })
                                 .catch(error => {

@@ -102,7 +102,8 @@
                 },
                 // display image with image string from database
                 getImageSrc(imageName) {
-                    return `{{ url_for('static', filename='img/student/') }}${imageName.includes('.') ? imageName : imageName + '.jpg'}`;
+                    // add ??timestamp=${Date.now()}` to avoid cache image display since we save new image same name
+                    return `/static/img/student/${imageName.includes('.') ? imageName : imageName + '.jpg'}?timestamp=${Date.now()}`;
                 },
                 // big size image js
                 scaleImage(event) {
@@ -115,12 +116,12 @@
                 },
                 // navigate to page
                 goTo(page, id) {
-                    if (page == 'index' && id === '') {
+                    if (page == 'index') {
                         this.getStudents();
                         this.studentContent = 'index';
                         this.resetForm();
                     }
-                    if (page == 'addstudent' && id === '') {
+                    if (page == 'addstudent') {
                         this.studentContent = 'addstudent';
                     }
                     if (page == 'detailstudent') {
